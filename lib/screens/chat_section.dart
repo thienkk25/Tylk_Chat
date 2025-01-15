@@ -12,9 +12,9 @@ class ChatSection extends StatelessWidget {
             CircleAvatar(
               radius: 20,
             ),
-            Padding(
-              padding: EdgeInsets.only(left: 10, right: 10),
-              child: Expanded(
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(left: 10, right: 10),
                 child: Text(
                   "Name",
                   maxLines: 1,
