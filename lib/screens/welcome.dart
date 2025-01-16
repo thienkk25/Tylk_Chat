@@ -1,3 +1,5 @@
+import 'package:app_chat/screens/login.dart';
+import 'package:app_chat/screens/register.dart';
 import 'package:flutter/material.dart';
 
 class Welcome extends StatelessWidget {
@@ -54,7 +56,10 @@ class Welcome extends StatelessWidget {
             child: Row(
               children: [
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (_) => const Login()));
+                  },
                   child: Container(
                     height: 50,
                     width: MediaQuery.of(context).size.width / 2,
@@ -73,7 +78,10 @@ class Welcome extends StatelessWidget {
                   ),
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushReplacement(context,
+                        MaterialPageRoute(builder: (_) => const Register()));
+                  },
                   child: Container(
                     height: 50,
                     width: MediaQuery.of(context).size.width / 2,
