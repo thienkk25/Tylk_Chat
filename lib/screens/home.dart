@@ -1,6 +1,8 @@
 import 'package:app_chat/screens/home_chat.dart';
+import 'package:app_chat/screens/login.dart';
 import 'package:app_chat/screens/people_online.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -20,6 +22,20 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Chat"),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: InkWell(
+                onTap: () async {
+                  Navigator.pushReplacement(context,
+                      MaterialPageRoute(builder: (_) => const Login()));
+                  final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  prefs.remove('token');
+                },
+                child: const Icon(Icons.exit_to_app)),
+          ),
+        ],
       ),
       body: IndexedStack(
         index: selectedIndex,
