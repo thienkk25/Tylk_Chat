@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatSection extends StatefulWidget {
@@ -13,7 +14,10 @@ class ChatSection extends StatefulWidget {
 
 class _ChatSectionState extends State<ChatSection> {
   TextEditingController textEditingController = TextEditingController();
+  ScrollController scrollController = ScrollController();
+  List dataMessage = [];
   late WebSocketChannel channel;
+  String myselftID = "";
   @override
   void initState() {
     super.initState();
@@ -23,16 +27,44 @@ class _ChatSectionState extends State<ChatSection> {
   @override
   void dispose() {
     textEditingController.dispose();
+    channel.sink.close();
     super.dispose();
+  }
+
+  Future<void> load() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      myselftID = prefs.getString("idUser")!;
+    });
   }
 
   Future<void> connectWS() async {
     channel = WebSocketChannel.connect(Uri.parse(dotenv.env['WEBSOCKET_URL']!));
     try {
       await channel.ready;
+      channel.stream.listen(
+        (data) {
+          setState(() {
+            dataMessage.add(jsonDecode(data));
+          });
+          scrollToBottom();
+        },
+      );
     } catch (e) {
       debugPrint("Error");
     }
+  }
+
+  void scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (scrollController.hasClients) {
+        scrollController.animateTo(
+          scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   @override
@@ -71,65 +103,60 @@ class _ChatSectionState extends State<ChatSection> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Align(
-              alignment: Alignment.centerRight,
-              child: Container(
-                margin: const EdgeInsets.all(10),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: Colors.lightBlueAccent),
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.blueAccent),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text(
-                      "Message 1",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      "10.2 A.M",
-                      style: TextStyle(fontSize: 10, color: Colors.grey[400]),
-                    ),
-                  ],
+      body: ListView.builder(
+        controller: scrollController,
+        itemCount: dataMessage.length,
+        itemBuilder: (context, index) => dataMessage[index]['id_from'] !=
+                myselftID
+            ? Align(
+                alignment: Alignment.centerLeft,
+                child: Container(
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 1, color: Colors.black),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.black),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        dataMessage[index]['content'],
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        dataMessage[index]['timestamp'],
+                        style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                      ),
+                    ],
+                  ),
                 ),
-              )),
-          Align(
-              alignment: Alignment.centerLeft,
-              child: Container(
-                margin: const EdgeInsets.all(10),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                    border: Border.all(width: 1, color: Colors.black),
-                    borderRadius: BorderRadius.circular(10),
-                    color: Colors.black),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text(
-                      "Message 2",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    Text(
-                      "10.2 A.M",
-                      style: TextStyle(fontSize: 10, color: Colors.grey[400]),
-                    ),
-                  ],
+              )
+            : Align(
+                alignment: Alignment.centerRight,
+                child: Container(
+                  margin: const EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      border:
+                          Border.all(width: 1, color: Colors.lightBlueAccent),
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.blueAccent),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        dataMessage[index]['content'],
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      Text(
+                        dataMessage[index]['timestamp'],
+                        style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                      ),
+                    ],
+                  ),
                 ),
-              )),
-          StreamBuilder(
-            stream: channel.stream,
-            builder: (context, snapshot) {
-              return Text(
-                snapshot.hasData
-                    ? 'Tin nhắn từ server: ${snapshot.data}'
-                    : 'Đang chờ tin nhắn...',
-              );
-            },
-          )
-        ],
+              ),
       ),
       bottomNavigationBar: Row(
         children: [
@@ -147,7 +174,7 @@ class _ChatSectionState extends State<ChatSection> {
                   // channel.sink.add(textEditingController.text);
                   channel.sink.add(jsonEncode({
                     'type': 'message',
-                    'id_from': 'a',
+                    'id_from': myselftID,
                     'id_to': 'b',
                     'content': textEditingController.text,
                   }));
@@ -161,17 +188,9 @@ class _ChatSectionState extends State<ChatSection> {
                 onPressed: () {
                   channel.sink.add(jsonEncode({
                     'type': 'join',
-                    'id_from': 'a',
+                    'id_from': myselftID,
                     'id_to': 'b',
                   }));
-                },
-                icon: const Icon(Icons.send)),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: IconButton(
-                onPressed: () {
-                  channel.sink.close();
                 },
                 icon: const Icon(Icons.send)),
           )
