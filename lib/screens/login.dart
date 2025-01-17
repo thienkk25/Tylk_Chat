@@ -167,6 +167,8 @@ class _LoginState extends State<Login> {
     if (data['token'] != null) {
       final SharedPreferences prefs = await SharedPreferences.getInstance();
       prefs.setString('token', data['token']);
+      prefs.setString('idUser', data['user']['id']);
+      prefs.setString('emailUser', data['user']['email']);
       if (!mounted) return;
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const Home()));

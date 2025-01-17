@@ -17,21 +17,38 @@ class _HomeState extends State<Home> {
     const PeopleOnline(),
   ];
   int selectedIndex = 0;
+  late SharedPreferences prefs;
+  String myselftEmail = "";
+  @override
+  void initState() {
+    load();
+    super.initState();
+  }
+
+  Future<void> load() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      myselftEmail = prefs.getString("emailUser")!;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Chat"),
         actions: [
+          Text(myselftEmail),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: InkWell(
                 onTap: () async {
                   Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (_) => const Login()));
-                  final SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
+
                   prefs.remove('token');
+                  prefs.remove('idUser');
+                  prefs.remove('emailUser');
                 },
                 child: const Icon(Icons.exit_to_app)),
           ),
