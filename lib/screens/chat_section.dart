@@ -1,27 +1,34 @@
 import 'dart:convert';
 
+import 'package:app_chat/config/format_time.dart';
+import 'package:app_chat/controllers/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatSection extends StatefulWidget {
-  const ChatSection({super.key});
+  final dynamic dataUserChat;
+  const ChatSection({super.key, required this.dataUserChat});
 
   @override
   State<ChatSection> createState() => _ChatSectionState();
 }
 
 class _ChatSectionState extends State<ChatSection> {
+  final chatController = ChatController();
   TextEditingController textEditingController = TextEditingController();
   ScrollController scrollController = ScrollController();
   List dataMessage = [];
   late WebSocketChannel channel;
   String myselftID = "";
+  int limit = 10;
+  int page = 1;
   @override
   void initState() {
-    super.initState();
+    Future.microtask(() => load());
     connectWS();
+    super.initState();
   }
 
   @override
@@ -33,21 +40,34 @@ class _ChatSectionState extends State<ChatSection> {
 
   Future<void> load() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    setState(() {
-      myselftID = prefs.getString("idUser")!;
-    });
+    myselftID = prefs.getString("idUser")!;
+    dataMessage = await chatController.getMessages(
+        myselftID, widget.dataUserChat['partner']['id'], limit, page);
+    scrollToBottom();
+    setState(() {});
   }
 
   Future<void> connectWS() async {
     channel = WebSocketChannel.connect(Uri.parse(dotenv.env['WEBSOCKET_URL']!));
     try {
       await channel.ready;
+      channel.sink.add(jsonEncode({
+        'type': 'join',
+        'chat_id': myselftID,
+        'sender_id': widget.dataUserChat['partner']['id'],
+      }));
       channel.stream.listen(
         (data) {
           setState(() {
             dataMessage.add(jsonDecode(data));
           });
           scrollToBottom();
+        },
+        onError: (error) {
+          debugPrint("WebSocket: $error");
+        },
+        onDone: () {
+          debugPrint("WebSocket closed");
         },
       );
     } catch (e) {
@@ -71,16 +91,16 @@ class _ChatSectionState extends State<ChatSection> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Row(
+        title: Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 20,
             ),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.only(left: 10, right: 10),
+                padding: const EdgeInsets.only(left: 10, right: 10),
                 child: Text(
-                  "Name",
+                  widget.dataUserChat['partner']['name'],
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -106,7 +126,7 @@ class _ChatSectionState extends State<ChatSection> {
       body: ListView.builder(
         controller: scrollController,
         itemCount: dataMessage.length,
-        itemBuilder: (context, index) => dataMessage[index]['id_from'] !=
+        itemBuilder: (context, index) => dataMessage[index]['chat_id'] !=
                 myselftID
             ? Align(
                 alignment: Alignment.centerLeft,
@@ -125,7 +145,8 @@ class _ChatSectionState extends State<ChatSection> {
                         style: const TextStyle(color: Colors.white),
                       ),
                       Text(
-                        dataMessage[index]['timestamp'],
+                        FormatTime()
+                            .coverTimeFromIso(dataMessage[index]['timestamp']),
                         style: TextStyle(fontSize: 10, color: Colors.grey[400]),
                       ),
                     ],
@@ -150,7 +171,8 @@ class _ChatSectionState extends State<ChatSection> {
                         style: const TextStyle(color: Colors.white),
                       ),
                       Text(
-                        dataMessage[index]['timestamp'],
+                        FormatTime()
+                            .coverTimeFromIso(dataMessage[index]['timestamp']),
                         style: TextStyle(fontSize: 10, color: Colors.grey[400]),
                       ),
                     ],
@@ -171,31 +193,28 @@ class _ChatSectionState extends State<ChatSection> {
             padding: const EdgeInsets.all(10.0),
             child: IconButton(
                 onPressed: () {
-                  // channel.sink.add(textEditingController.text);
-                  channel.sink.add(jsonEncode({
-                    'type': 'message',
-                    'id_from': myselftID,
-                    'id_to': 'b',
-                    'content': textEditingController.text,
-                  }));
-                  textEditingController.clear();
-                },
-                icon: const Icon(Icons.send)),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: IconButton(
-                onPressed: () {
-                  channel.sink.add(jsonEncode({
-                    'type': 'join',
-                    'id_from': myselftID,
-                    'id_to': 'b',
-                  }));
+                  sendMessage(textEditingController.text);
                 },
                 icon: const Icon(Icons.send)),
           )
         ],
       ),
     );
+  }
+
+  Future<void> sendMessage(String content) async {
+    final resultChat = await chatController.chats(
+        [myselftID, widget.dataUserChat['partner']['id']],
+        content,
+        widget.dataUserChat['partner']['id']);
+    final resultMessage = await chatController.messages(myselftID,
+        widget.dataUserChat['partner']['id'], content, "message", [], "");
+    channel.sink.add(jsonEncode({
+      'type': 'message',
+      'chat_id': myselftID,
+      'sender_id': widget.dataUserChat['partner']['id'],
+      'content': content,
+    }));
+    textEditingController.clear();
   }
 }

@@ -65,7 +65,7 @@ class _HomeState extends State<Home> {
               }),
           destinations: const [
             NavigationDestination(icon: Icon(Icons.chat), label: "Chat"),
-            NavigationDestination(icon: Icon(Icons.people), label: "Online"),
+            NavigationDestination(icon: Icon(Icons.people), label: "Friends"),
           ]),
       floatingActionButton: Container(
         height: 50,

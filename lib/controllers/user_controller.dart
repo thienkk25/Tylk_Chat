@@ -9,8 +9,4 @@ class UserController {
   Future<Map> registerUser(String email, String password) async {
     return await userService.registerUser(email, password);
   }
-
-  Future<Map> sendChat(String idTo, String content) async {
-    return await userService.sendChat(idTo, content);
-  }
 }
