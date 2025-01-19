@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 final headers = {"Content-Type": "application/json"};
 
@@ -23,6 +24,21 @@ class UserService {
       uri,
       body: jsonEncode({"email": email, "password": password}),
       headers: headers,
+    );
+    final data = jsonDecode(response.body);
+
+    return data;
+  }
+
+  Future<Map> getFriends(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final uri = Uri.parse("http://localhost:3000/v1/api/user/${id}/friends");
+    final response = await http.get(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer ${prefs.getString('token')!}"
+      },
     );
     final data = jsonDecode(response.body);
 

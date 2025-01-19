@@ -9,4 +9,9 @@ class UserController {
   Future<Map> registerUser(String email, String password) async {
     return await userService.registerUser(email, password);
   }
+
+  Future<List> getFriends(String id) async {
+    final data = await userService.getFriends(id);
+    return data['data'];
+  }
 }
