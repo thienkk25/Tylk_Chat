@@ -56,20 +56,12 @@ class _ChatSectionState extends State<ChatSection> {
         'chat_id': myselftID,
         'sender_id': widget.dataUserChat['partner']['id'],
       }));
-      channel.stream.listen(
-        (data) {
-          setState(() {
-            dataMessage.add(jsonDecode(data));
-          });
-          scrollToBottom();
-        },
-        onError: (error) {
-          debugPrint("WebSocket: $error");
-        },
-        onDone: () {
-          debugPrint("WebSocket closed");
-        },
-      );
+      channel.stream.listen((data) {
+        setState(() {
+          dataMessage.add(jsonDecode(data));
+        });
+        scrollToBottom();
+      });
     } catch (e) {
       debugPrint("Error");
     }
