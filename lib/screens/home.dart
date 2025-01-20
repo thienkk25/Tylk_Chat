@@ -67,15 +67,41 @@ class _HomeState extends State<Home> {
             NavigationDestination(icon: Icon(Icons.chat), label: "Chat"),
             NavigationDestination(icon: Icon(Icons.people), label: "Friends"),
           ]),
-      floatingActionButton: Container(
-        height: 50,
-        width: 50,
-        decoration: BoxDecoration(
-          color: Colors.lightBlueAccent,
-          border: Border.all(width: 1, color: Colors.lightBlueAccent),
-          borderRadius: BorderRadius.circular(10),
+      floatingActionButton: InkWell(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return Dialog(
+                child: SizedBox(
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: Icon(Icons.keyboard_arrow_left),
+                        title: Center(child: Text("Add message")),
+                      ),
+                      TextField(),
+                      TextField(),
+                      TextField(),
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        },
+        child: Container(
+          height: 50,
+          width: 50,
+          decoration: BoxDecoration(
+            color: Colors.lightBlueAccent,
+            border: Border.all(width: 1, color: Colors.lightBlueAccent),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Icon(Icons.add),
         ),
-        child: const Icon(Icons.add),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
