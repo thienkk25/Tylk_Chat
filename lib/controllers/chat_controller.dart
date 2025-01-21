@@ -18,9 +18,15 @@ class ChatController {
     return data;
   }
 
-  Future<Map> messages(String chatId, String senderId, String content,
-      String messageType, List attachments, String status) async {
+  Future<Map> messages(String senderId, String content, String messageType,
+      List attachments, String status) async {
     return await chatService.messages(
-        chatId, senderId, content, messageType, attachments, status);
+        senderId, content, messageType, attachments, status);
+  }
+
+  Future<Map> sendAddMessage(String email, String content, String messageType,
+      List attachments, String status) async {
+    return await chatService.sendAddMessage(
+        email, content, messageType, attachments, status);
   }
 }

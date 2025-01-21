@@ -14,4 +14,9 @@ class UserController {
     final data = await userService.getFriends(id);
     return data['data'];
   }
+
+  Future<List> getSearchClients(String searchQuery) async {
+    final data = await userService.getSearchClients(searchQuery);
+    return data['data'];
+  }
 }

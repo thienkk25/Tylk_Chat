@@ -60,19 +60,42 @@ class ChatService {
     return data;
   }
 
-  Future<Map> messages(String chatId, String senderId, String content,
-      String messageType, List attachments, String status) async {
+  Future<Map> messages(String senderId, String content, String messageType,
+      List attachments, String status) async {
     final prefs = await SharedPreferences.getInstance();
     final headers = {
       "Content-Type": "application/json",
       "Authorization": "Bearer ${prefs.getString('token')!}"
     };
-    final uri = Uri.parse("http://localhost:3000/v1/api/chat/$chatId/messages");
+    final uri = Uri.parse("http://localhost:3000/v1/api/chat/messages");
     final response = await http.post(
       uri,
       body: jsonEncode({
-        "chat_id": chatId,
         "sender_id": senderId,
+        "content": content,
+        "message_type": messageType,
+        "attachments": attachments,
+        "status": status
+      }),
+      headers: headers,
+    );
+    final data = jsonDecode(response.body);
+
+    return data;
+  }
+
+  Future<Map> sendAddMessage(String email, String content, String messageType,
+      List attachments, String status) async {
+    final prefs = await SharedPreferences.getInstance();
+    final headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer ${prefs.getString('token')!}"
+    };
+    final uri = Uri.parse("http://localhost:3000/v1/api/chat/newmessages");
+    final response = await http.post(
+      uri,
+      body: jsonEncode({
+        "email": email,
         "content": content,
         "message_type": messageType,
         "attachments": attachments,

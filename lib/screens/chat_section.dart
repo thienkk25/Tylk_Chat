@@ -26,7 +26,11 @@ class _ChatSectionState extends State<ChatSection> {
   int page = 1;
   @override
   void initState() {
-    Future.microtask(() => load());
+    WidgetsBinding.instance.addPostFrameCallback(
+      (timeStamp) {
+        load();
+      },
+    );
     connectWS();
     super.initState();
   }
@@ -199,7 +203,7 @@ class _ChatSectionState extends State<ChatSection> {
         [myselftID, widget.dataUserChat['partner']['id']],
         content,
         widget.dataUserChat['partner']['id']);
-    final resultMessage = await chatController.messages(myselftID,
+    final resultMessage = await chatController.messages(
         widget.dataUserChat['partner']['id'], content, "message", [], "");
     channel.sink.add(jsonEncode({
       'type': 'message',

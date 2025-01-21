@@ -44,4 +44,20 @@ class UserService {
 
     return data;
   }
+
+  Future<Map> getSearchClients(String searchQuery) async {
+    final prefs = await SharedPreferences.getInstance();
+    final uri =
+        Uri.parse("http://localhost:3000/v1/api/user/$searchQuery/clients");
+    final response = await http.get(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer ${prefs.getString('token')!}"
+      },
+    );
+    final data = jsonDecode(response.body);
+
+    return data;
+  }
 }

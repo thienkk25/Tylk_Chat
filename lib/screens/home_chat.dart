@@ -22,7 +22,11 @@ class _HomeChatState extends State<HomeChat> {
   String myselftID = "";
   @override
   void initState() {
-    Future.microtask(() => {loadData(), connectWS()});
+    // Future.microtask(() => {loadData(), connectWS()});
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      loadData();
+      connectWS();
+    });
     super.initState();
   }
 
