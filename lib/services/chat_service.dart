@@ -50,7 +50,7 @@ class ChatService {
     };
 
     final uri = Uri.parse(
-        "http://localhost:3000/v1/api/chat/messages?chat_id=${chatId}&render_id=${renderId}&limit=${limit}&page=${page}");
+        "http://localhost:3000/v1/api/chat/messages?chat_id=$chatId&render_id=$renderId&limit=$limit&page=$page");
     final response = await http.get(
       uri,
       headers: headers,
@@ -67,8 +67,7 @@ class ChatService {
       "Content-Type": "application/json",
       "Authorization": "Bearer ${prefs.getString('token')!}"
     };
-    final uri =
-        Uri.parse("http://localhost:3000/v1/api/chat/${chatId}/messages");
+    final uri = Uri.parse("http://localhost:3000/v1/api/chat/$chatId/messages");
     final response = await http.post(
       uri,
       body: jsonEncode({
