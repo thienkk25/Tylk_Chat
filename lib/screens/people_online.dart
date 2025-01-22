@@ -1,6 +1,5 @@
 import 'package:app_chat/controllers/user_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class PeopleOnline extends StatefulWidget {
   const PeopleOnline({super.key});
