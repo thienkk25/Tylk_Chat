@@ -10,8 +10,8 @@ class UserController {
     return await userService.registerUser(email, password);
   }
 
-  Future<List> getFriends(String id) async {
-    final data = await userService.getFriends(id);
+  Future<List> getFriends() async {
+    final data = await userService.getFriends();
     return data['data'];
   }
 

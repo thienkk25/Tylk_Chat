@@ -30,9 +30,9 @@ class UserService {
     return data;
   }
 
-  Future<Map> getFriends(String id) async {
+  Future<Map> getFriends() async {
     final prefs = await SharedPreferences.getInstance();
-    final uri = Uri.parse("http://localhost:3000/v1/api/user/$id/friends");
+    final uri = Uri.parse("http://localhost:3000/v1/api/user/friends");
     final response = await http.get(
       uri,
       headers: {

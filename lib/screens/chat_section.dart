@@ -4,49 +4,36 @@ import 'package:app_chat/config/format_time.dart';
 import 'package:app_chat/controllers/chat_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatSection extends StatefulWidget {
+  final String myselftID;
   final dynamic dataUserChat;
-  const ChatSection({super.key, required this.dataUserChat});
+  const ChatSection(
+      {super.key, required this.dataUserChat, required this.myselftID});
 
   @override
   State<ChatSection> createState() => _ChatSectionState();
 }
 
 class _ChatSectionState extends State<ChatSection> {
-  final chatController = ChatController();
+  ChatController chatController = ChatController();
   TextEditingController textEditingController = TextEditingController();
   ScrollController scrollController = ScrollController();
   List dataMessage = [];
   late WebSocketChannel channel;
-  String myselftID = "";
   int limit = 10;
   int page = 1;
   @override
   void initState() {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (timeStamp) {
-        load();
-      },
-    );
+    load();
     connectWS();
     super.initState();
   }
 
-  @override
-  void dispose() {
-    textEditingController.dispose();
-    channel.sink.close();
-    super.dispose();
-  }
-
   Future<void> load() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    myselftID = prefs.getString("idUser")!;
     dataMessage = await chatController.getMessages(
-        myselftID, widget.dataUserChat['partner']['id'], limit, page);
+        widget.myselftID, widget.dataUserChat['partner']['id'], limit, page);
     scrollToBottom();
     setState(() {});
   }
@@ -57,7 +44,7 @@ class _ChatSectionState extends State<ChatSection> {
       await channel.ready;
       channel.sink.add(jsonEncode({
         'type': 'join',
-        'chat_id': myselftID,
+        'chat_id': widget.myselftID,
         'sender_id': widget.dataUserChat['partner']['id'],
       }));
       channel.stream.listen((data) {
@@ -81,6 +68,13 @@ class _ChatSectionState extends State<ChatSection> {
         );
       }
     });
+  }
+
+  @override
+  void dispose() {
+    textEditingController.dispose();
+    channel.sink.close();
+    super.dispose();
   }
 
   @override
@@ -120,62 +114,64 @@ class _ChatSectionState extends State<ChatSection> {
         ],
       ),
       body: ListView.builder(
-        controller: scrollController,
-        itemCount: dataMessage.length,
-        itemBuilder: (context, index) => dataMessage[index]['chat_id'] !=
-                myselftID
-            ? Align(
-                alignment: Alignment.centerLeft,
-                child: Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      border: Border.all(width: 1, color: Colors.black),
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.black),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        dataMessage[index]['content'],
-                        style: const TextStyle(color: Colors.white),
+          controller: scrollController,
+          itemCount: dataMessage.length,
+          itemBuilder: (context, index) {
+            return dataMessage[index]['chat_id'] == widget.myselftID
+                ? Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      margin: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                              width: 1, color: Colors.lightBlueAccent),
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.blueAccent),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            dataMessage[index]['content'],
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          Text(
+                            FormatTime().coverTimeFromIso(
+                                dataMessage[index]['timestamp']),
+                            style: TextStyle(
+                                fontSize: 10, color: Colors.grey[400]),
+                          ),
+                        ],
                       ),
-                      Text(
-                        FormatTime()
-                            .coverTimeFromIso(dataMessage[index]['timestamp']),
-                        style: TextStyle(fontSize: 10, color: Colors.grey[400]),
+                    ),
+                  )
+                : Align(
+                    alignment: Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          border: Border.all(width: 1, color: Colors.black),
+                          borderRadius: BorderRadius.circular(10),
+                          color: Colors.black),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            dataMessage[index]['content'],
+                            style: const TextStyle(color: Colors.white),
+                          ),
+                          Text(
+                            FormatTime().coverTimeFromIso(
+                                dataMessage[index]['timestamp']),
+                            style: TextStyle(
+                                fontSize: 10, color: Colors.grey[400]),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
-              )
-            : Align(
-                alignment: Alignment.centerRight,
-                child: Container(
-                  margin: const EdgeInsets.all(10),
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                      border:
-                          Border.all(width: 1, color: Colors.lightBlueAccent),
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.blueAccent),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        dataMessage[index]['content'],
-                        style: const TextStyle(color: Colors.white),
-                      ),
-                      Text(
-                        FormatTime()
-                            .coverTimeFromIso(dataMessage[index]['timestamp']),
-                        style: TextStyle(fontSize: 10, color: Colors.grey[400]),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-      ),
+                    ),
+                  );
+          }),
       bottomNavigationBar: Row(
         children: [
           Expanded(
@@ -200,14 +196,14 @@ class _ChatSectionState extends State<ChatSection> {
 
   Future<void> sendMessage(String content) async {
     final resultChat = await chatController.chats(
-        [myselftID, widget.dataUserChat['partner']['id']],
+        [widget.myselftID, widget.dataUserChat['partner']['id']],
         content,
         widget.dataUserChat['partner']['id']);
     final resultMessage = await chatController.messages(
         widget.dataUserChat['partner']['id'], content, "message", [], "");
     channel.sink.add(jsonEncode({
       'type': 'message',
-      'chat_id': myselftID,
+      'chat_id': widget.myselftID,
       'sender_id': widget.dataUserChat['partner']['id'],
       'content': content,
     }));

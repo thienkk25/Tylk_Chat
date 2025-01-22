@@ -22,8 +22,7 @@ class _PeopleOnlineState extends State<PeopleOnline> {
   }
 
   Future<void> load() async {
-    final prefs = await SharedPreferences.getInstance();
-    dataFriends = await userController.getFriends(prefs.getString('idUser')!);
+    dataFriends = await userController.getFriends();
     setState(() {});
   }
 

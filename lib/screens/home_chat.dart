@@ -22,7 +22,6 @@ class _HomeChatState extends State<HomeChat> {
   String myselftID = "";
   @override
   void initState() {
-    // Future.microtask(() => {loadData(), connectWS()});
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       loadData();
       connectWS();
@@ -66,6 +65,7 @@ class _HomeChatState extends State<HomeChat> {
               context,
               MaterialPageRoute(
                 builder: (_) => ChatSection(
+                  myselftID: myselftID,
                   dataUserChat: dataChats[index],
                 ),
               ),
