@@ -4,6 +4,7 @@ import 'package:app_chat/screens/login.dart';
 import 'package:app_chat/screens/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
@@ -39,7 +40,8 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: token != null ? const Home() : const Welcome(),
+      home:
+          token != null ? const ProviderScope(child: Home()) : const Welcome(),
       // home: Home(),
     );
   }
