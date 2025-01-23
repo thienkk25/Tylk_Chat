@@ -1,4 +1,5 @@
 import 'package:app_chat/services/chat_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChatController {
   final chatService = ChatService();
@@ -15,6 +16,7 @@ class ChatController {
   Future<List> getMessages(
       String chatId, String renderId, int limit, int page) async {
     List data = await chatService.getMessages(chatId, renderId, limit, page);
+
     return data;
   }
 

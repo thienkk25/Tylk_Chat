@@ -38,11 +38,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home:
-          token != null ? const ProviderScope(child: Home()) : const Welcome(),
-      // home: Home(),
+    return ProviderScope(
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: token != null ? const Home() : const Welcome(),
+        // home: Home(),
+      ),
     );
   }
 }

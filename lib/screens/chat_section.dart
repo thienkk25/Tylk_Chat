@@ -2,32 +2,47 @@ import 'dart:convert';
 
 import 'package:app_chat/config/format_time.dart';
 import 'package:app_chat/controllers/chat_controller.dart';
+import 'package:app_chat/services/websocket_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-class ChatSection extends StatefulWidget {
+class ChatSection extends ConsumerStatefulWidget {
   final String myselftID;
   final dynamic dataUserChat;
+  final int indexChatId;
   const ChatSection(
-      {super.key, required this.dataUserChat, required this.myselftID});
+      {super.key,
+      required this.dataUserChat,
+      required this.myselftID,
+      required this.indexChatId});
 
   @override
-  State<ChatSection> createState() => _ChatSectionState();
+  ConsumerState<ChatSection> createState() => _ChatSectionState();
 }
 
-class _ChatSectionState extends State<ChatSection> {
+class _ChatSectionState extends ConsumerState<ChatSection> {
   ChatController chatController = ChatController();
   TextEditingController textEditingController = TextEditingController();
   ScrollController scrollController = ScrollController();
   List dataMessage = [];
-  late WebSocketChannel channel;
   int limit = 10;
   int page = 1;
   @override
   void initState() {
-    load();
-    connectWS();
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) {
+        ref.read(websocketStateNotifierProvider.notifier).sendMessage({
+          'type': 'join',
+          'chat_id': widget.myselftID,
+          'sender_id': widget.dataUserChat['partner']['id'],
+        });
+
+        load();
+      },
+    );
+
     super.initState();
   }
 
@@ -35,27 +50,8 @@ class _ChatSectionState extends State<ChatSection> {
     dataMessage = await chatController.getMessages(
         widget.myselftID, widget.dataUserChat['partner']['id'], limit, page);
     scrollToBottom();
-    setState(() {});
-  }
 
-  Future<void> connectWS() async {
-    channel = WebSocketChannel.connect(Uri.parse(dotenv.env['WEBSOCKET_URL']!));
-    try {
-      await channel.ready;
-      channel.sink.add(jsonEncode({
-        'type': 'join',
-        'chat_id': widget.myselftID,
-        'sender_id': widget.dataUserChat['partner']['id'],
-      }));
-      channel.stream.listen((data) {
-        setState(() {
-          dataMessage.add(jsonDecode(data));
-        });
-        scrollToBottom();
-      });
-    } catch (e) {
-      debugPrint("Error");
-    }
+    setState(() {});
   }
 
   void scrollToBottom() {
@@ -73,12 +69,18 @@ class _ChatSectionState extends State<ChatSection> {
   @override
   void dispose() {
     textEditingController.dispose();
-    channel.sink.close();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    final dataRealTime = ref.watch(dataMessages);
+    if (dataRealTime != null) {
+      // setState(() {
+      dataMessage.add(dataRealTime);
+      scrollToBottom();
+      // });
+    }
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -201,12 +203,13 @@ class _ChatSectionState extends State<ChatSection> {
         widget.dataUserChat['partner']['id']);
     final resultMessage = await chatController.messages(
         widget.dataUserChat['partner']['id'], content, "message", [], "");
-    channel.sink.add(jsonEncode({
+    ref.read(websocketStateNotifierProvider.notifier).sendMessage({
       'type': 'message',
       'chat_id': widget.myselftID,
       'sender_id': widget.dataUserChat['partner']['id'],
       'content': content,
-    }));
+      'indexChat_id': widget.indexChatId
+    });
     textEditingController.clear();
   }
 }
