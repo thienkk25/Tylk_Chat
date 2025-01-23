@@ -48,9 +48,10 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
 
   Future<void> load() async {
     dataMessage = await chatController.getMessages(
-        widget.myselftID, widget.dataUserChat['partner']['id'], limit, page);
+        widget.dataUserChat['partner']['id'], limit, page);
+    dataMessage = dataMessage.reversed.toList();
     scrollToBottom();
-
+    ref.read(dataMessages.notifier).state = null;
     setState(() {});
   }
 
@@ -76,10 +77,8 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
   Widget build(BuildContext context) {
     final dataRealTime = ref.watch(dataMessages);
     if (dataRealTime != null) {
-      // setState(() {
       dataMessage.add(dataRealTime);
       scrollToBottom();
-      // });
     }
     return Scaffold(
       appBar: AppBar(

@@ -13,9 +13,8 @@ class ChatController {
     return await chatService.chats(participants, content, senderId);
   }
 
-  Future<List> getMessages(
-      String chatId, String renderId, int limit, int page) async {
-    List data = await chatService.getMessages(chatId, renderId, limit, page);
+  Future<List> getMessages(String renderId, int limit, int page) async {
+    List data = await chatService.getMessages(renderId, limit, page);
 
     return data;
   }

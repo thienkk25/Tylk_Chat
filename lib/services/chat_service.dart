@@ -42,8 +42,7 @@ class ChatService {
     return data;
   }
 
-  Future<List> getMessages(
-      String chatId, String renderId, int limit, int page) async {
+  Future<List> getMessages(String renderId, int limit, int page) async {
     final prefs = await SharedPreferences.getInstance();
     final headers = {
       "Content-Type": "application/json",
@@ -51,7 +50,7 @@ class ChatService {
     };
 
     final uri = Uri.parse(
-        "http://localhost:3000/v1/api/chat/messages?chat_id=$chatId&render_id=$renderId&limit=$limit&page=$page");
+        "http://localhost:3000/v1/api/chat/messages?render_id=$renderId&limit=$limit&page=$page");
     final response = await http.get(
       uri,
       headers: headers,

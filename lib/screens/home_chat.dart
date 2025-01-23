@@ -39,11 +39,11 @@ class _HomeChatState extends ConsumerState<HomeChat> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     myselftID = prefs.getString("idUser")!;
     dataChats = await chatController.getChats();
-    setState(() {});
 
     ref
         .read(websocketStateNotifierProvider.notifier)
         .sendMessage({'type': 'status', 'chat_id': myselftID});
+    setState(() {});
   }
 
   @override
