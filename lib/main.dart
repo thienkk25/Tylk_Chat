@@ -1,6 +1,4 @@
-import 'package:app_chat/screens/chat_section.dart';
 import 'package:app_chat/screens/home.dart';
-import 'package:app_chat/screens/login.dart';
 import 'package:app_chat/screens/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -11,7 +9,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await dotenv.load(fileName: ".env");
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatefulWidget {
@@ -38,12 +36,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return ProviderScope(
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: token != null ? const Home() : const Welcome(),
-        // home: Home(),
-      ),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: token != null ? const Home() : const Welcome(),
+      // home: Home(),
     );
   }
 }

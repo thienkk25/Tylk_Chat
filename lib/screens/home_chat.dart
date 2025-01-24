@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:app_chat/config/format_time.dart';
 import 'package:app_chat/controllers/chat_controller.dart';
 import 'package:app_chat/screens/chat_section.dart';
@@ -48,18 +46,23 @@ class _HomeChatState extends ConsumerState<HomeChat> {
 
   @override
   void dispose() {
-    ref.read(websocketStateNotifierProvider.notifier).disconnection();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final dataRealTime = ref.watch(dataMessages);
+
     if (dataRealTime != null) {
-      dataChats[dataRealTime['indexChat_id']]['last_message']['content'] =
-          dataRealTime['content'];
-      dataChats[dataRealTime['indexChat_id']]['last_message']['timestamp'] =
-          dataRealTime['timestamp'];
+      int index = dataChats
+          .indexWhere((element) => element['_id'] == dataRealTime['id']);
+      if (index != -1) {
+        dataChats[index]['last_message']['sender_id'] =
+            dataRealTime['sender_id'];
+        dataChats[index]['last_message']['content'] = dataRealTime['content'];
+        dataChats[index]['last_message']['timestamp'] =
+            dataRealTime['timestamp'];
+      }
     }
     return SafeArea(
       child: ListView.builder(
@@ -72,9 +75,7 @@ class _HomeChatState extends ConsumerState<HomeChat> {
               context,
               MaterialPageRoute(
                 builder: (_) => ChatSection(
-                    myselftID: myselftID,
-                    dataUserChat: dataChats[index],
-                    indexChatId: index),
+                    myselftID: myselftID, dataUserChat: dataChats[index]),
               ),
             ),
             child: Padding(

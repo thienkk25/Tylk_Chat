@@ -14,10 +14,19 @@ class WebsocketStateNotifier extends StateNotifier<WebSocketChannel?> {
 
     final channel = WebSocketChannel.connect(Uri.parse(url));
     state = channel;
-    state!.stream.listen((message) {
-      final decodedMessage = jsonDecode(message);
-      ref.read(dataMessages.notifier).state = decodedMessage;
-    });
+    final dataMessagesNotifier = ref.read(dataMessages.notifier);
+    state!.stream.listen(
+      (message) {
+        final decodedMessage = jsonDecode(message);
+        dataMessagesNotifier.state = decodedMessage;
+      },
+      onDone: () {
+        if (state != null) {
+          state!.sink.close();
+          state = null;
+        }
+      },
+    );
   }
 
   void sendMessage(Map<String, dynamic> message) {

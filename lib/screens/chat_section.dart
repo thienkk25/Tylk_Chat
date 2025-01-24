@@ -1,22 +1,17 @@
-import 'dart:convert';
-
 import 'package:app_chat/config/format_time.dart';
 import 'package:app_chat/controllers/chat_controller.dart';
 import 'package:app_chat/services/websocket_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:web_socket_channel/web_socket_channel.dart';
 
 class ChatSection extends ConsumerStatefulWidget {
   final String myselftID;
   final dynamic dataUserChat;
-  final int indexChatId;
-  const ChatSection(
-      {super.key,
-      required this.dataUserChat,
-      required this.myselftID,
-      required this.indexChatId});
+  const ChatSection({
+    super.key,
+    required this.dataUserChat,
+    required this.myselftID,
+  });
 
   @override
   ConsumerState<ChatSection> createState() => _ChatSectionState();
@@ -38,7 +33,7 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
           'chat_id': widget.myselftID,
           'sender_id': widget.dataUserChat['partner']['id'],
         });
-
+        ref.read(dataMessages.notifier).state = null;
         load();
       },
     );
@@ -50,8 +45,8 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
     dataMessage = await chatController.getMessages(
         widget.dataUserChat['partner']['id'], limit, page);
     dataMessage = dataMessage.reversed.toList();
+
     scrollToBottom();
-    ref.read(dataMessages.notifier).state = null;
     setState(() {});
   }
 
@@ -76,7 +71,8 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
   @override
   Widget build(BuildContext context) {
     final dataRealTime = ref.watch(dataMessages);
-    if (dataRealTime != null) {
+    if (dataRealTime != null &&
+        widget.dataUserChat['_id'] == dataRealTime['id']) {
       dataMessage.add(dataRealTime);
       scrollToBottom();
     }
@@ -204,10 +200,10 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
         widget.dataUserChat['partner']['id'], content, "message", [], "");
     ref.read(websocketStateNotifierProvider.notifier).sendMessage({
       'type': 'message',
+      'id': widget.dataUserChat['_id'],
       'chat_id': widget.myselftID,
       'sender_id': widget.dataUserChat['partner']['id'],
-      'content': content,
-      'indexChat_id': widget.indexChatId
+      'content': content
     });
     textEditingController.clear();
   }
