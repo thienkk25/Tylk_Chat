@@ -15,6 +15,11 @@ class UserController {
     return data['data'];
   }
 
+  Future<List?> addFriends(List<String> receiverIds) async {
+    final data = await userService.addFriends(receiverIds);
+    return data['data'];
+  }
+
   Future<List> getSearchClients(String searchQuery) async {
     final data = await userService.getSearchClients(searchQuery);
     return data['data'];

@@ -45,6 +45,22 @@ class UserService {
     return data;
   }
 
+  Future<Map> addFriends(List<String> receiverIds) async {
+    final prefs = await SharedPreferences.getInstance();
+    final uri = Uri.parse("http://localhost:3000/v1/api/user/friends");
+    final response = await http.post(
+      uri,
+      body: jsonEncode({"receiver_ids": receiverIds}),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer ${prefs.getString('token')!}"
+      },
+    );
+    final data = jsonDecode(response.body);
+
+    return data;
+  }
+
   Future<Map> getSearchClients(String searchQuery) async {
     final prefs = await SharedPreferences.getInstance();
     final uri =

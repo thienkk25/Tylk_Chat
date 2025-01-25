@@ -5,17 +5,19 @@ import 'package:app_chat/controllers/user_controller.dart';
 import 'package:app_chat/screens/home_chat.dart';
 import 'package:app_chat/screens/login.dart';
 import 'package:app_chat/screens/people_online.dart';
+import 'package:app_chat/services/websocket_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class Home extends StatefulWidget {
+class Home extends ConsumerStatefulWidget {
   const Home({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  ConsumerState<Home> createState() => _HomeState();
 }
 
-class _HomeState extends State<Home> {
+class _HomeState extends ConsumerState<Home> {
   UserController userController = UserController();
   ChatController chatController = ChatController();
   Timer? timer;
@@ -32,6 +34,7 @@ class _HomeState extends State<Home> {
   // Regular expression for email validation
   final RegExp emailRegExp = RegExp(
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+");
+
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -72,6 +75,12 @@ class _HomeState extends State<Home> {
                   prefs.remove('token');
                   prefs.remove('idUser');
                   prefs.remove('emailUser');
+                  ref.read(dataRealTimeNotifierProvider.notifier).initState();
+                  ref
+                      .read(websocketStateNotifierProvider.notifier)
+                      .disconnection();
+                  ref.read(dataChatsNotifierProvider.notifier).reset();
+                  ref.read(dataMessagesNotifierProvider.notifier).reset();
                 },
                 child: const Icon(Icons.exit_to_app)),
           ),
@@ -95,6 +104,8 @@ class _HomeState extends State<Home> {
           showDialog(
             context: context,
             builder: (context) {
+              Map temporaryData = {};
+              bool enabledSearch = true;
               return StatefulBuilder(
                 builder: (context, StateSetter setDialogState) {
                   return Dialog(
@@ -105,7 +116,13 @@ class _HomeState extends State<Home> {
                         children: [
                           ListTile(
                             trailing: InkWell(
-                                onTap: () => Navigator.pop(context),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  enabledSearch = false;
+                                  dataSearch = [];
+                                  toSendController.clear();
+                                  setDialogState(() {});
+                                },
                                 child: const Icon(Icons.close)),
                             title: const Center(child: Text("Add message")),
                           ),
@@ -113,6 +130,7 @@ class _HomeState extends State<Home> {
                             height: 40,
                             width: MediaQuery.of(context).size.width / 2,
                             child: SearchBar(
+                              enabled: enabledSearch,
                               controller: toSendController,
                               leading: const Text("To:"),
                               trailing: [
@@ -121,9 +139,7 @@ class _HomeState extends State<Home> {
                                   onPressed: () {
                                     toSendController.clear();
                                     dataSearch = [];
-                                    setDialogState(
-                                      () {},
-                                    );
+                                    setDialogState(() {});
                                   },
                                 ),
                               ],
@@ -133,15 +149,12 @@ class _HomeState extends State<Home> {
                                 if (timer?.isActive ?? false) {
                                   timer?.cancel();
                                 }
-
                                 timer = Timer(
-                                  Durations.medium3,
+                                  const Duration(seconds: 1),
                                   () async {
                                     dataSearch = await userController
                                         .getSearchClients(value);
-                                    setDialogState(
-                                      () {},
-                                    );
+                                    setDialogState(() {});
                                   },
                                 );
                               },
@@ -161,7 +174,9 @@ class _HomeState extends State<Home> {
                                     onTap: () {
                                       toSendController.text =
                                           dataSearch[index]['email'];
+                                      temporaryData = dataSearch[index];
                                       dataSearch = [];
+                                      enabledSearch = false;
                                       setDialogState(() => {});
                                     },
                                     child: Padding(
@@ -206,10 +221,11 @@ class _HomeState extends State<Home> {
                             child: InkWell(
                               onTap: () {
                                 if (emailRegExp
-                                        .hasMatch(toSendController.text) &&
-                                    contentSendController.text.isNotEmpty) {
+                                            .hasMatch(toSendController.text) &&
+                                        contentSendController.text.isNotEmpty ||
+                                    enabledSearch != true) {
                                   sendNewMessage(
-                                      toSendController.text,
+                                      temporaryData['email'],
                                       contentSendController.text,
                                       "message",
                                       [],
@@ -264,6 +280,7 @@ class _HomeState extends State<Home> {
     Navigator.pop(context);
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(result['message'])));
+    await ref.read(dataChatsNotifierProvider.notifier).refresh();
     toSendController.clear();
     contentSendController.clear();
   }

@@ -21,19 +21,12 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
   ChatController chatController = ChatController();
   TextEditingController textEditingController = TextEditingController();
   ScrollController scrollController = ScrollController();
-  List dataMessage = [];
   int limit = 10;
   int page = 1;
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback(
       (_) {
-        ref.read(websocketStateNotifierProvider.notifier).sendMessage({
-          'type': 'join',
-          'chat_id': widget.myselftID,
-          'sender_id': widget.dataUserChat['partner']['id'],
-        });
-        ref.read(dataMessages.notifier).state = null;
         load();
       },
     );
@@ -42,12 +35,18 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
   }
 
   Future<void> load() async {
-    dataMessage = await chatController.getMessages(
-        widget.dataUserChat['partner']['id'], limit, page);
-    dataMessage = dataMessage.reversed.toList();
-
+    ref.read(websocketStateNotifierProvider.notifier).sendMessage({
+      'type': 'join',
+      'sender_id': widget.myselftID,
+      'receiver_id': widget.dataUserChat['partner']['id'],
+    });
+    ref.read(dataMessagesNotifierProvider.notifier).initState(
+        (await chatController.getMessages(
+                widget.dataUserChat['partner']['id'], limit, page))
+            .reversed
+            .toList());
+    ref.read(dataRealTimeNotifierProvider.notifier).initState();
     scrollToBottom();
-    setState(() {});
   }
 
   void scrollToBottom() {
@@ -64,16 +63,18 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
 
   @override
   void dispose() {
+    scrollController.dispose();
     textEditingController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final dataRealTime = ref.watch(dataMessages);
-    if (dataRealTime != null &&
+    final dataMessage = ref.watch(dataMessagesNotifierProvider);
+    final dataRealTime = ref.watch(dataRealTimeNotifierProvider);
+    if (dataRealTime.isNotEmpty &&
         widget.dataUserChat['_id'] == dataRealTime['id']) {
-      dataMessage.add(dataRealTime);
+      ref.read(dataMessagesNotifierProvider).add(dataRealTime);
       scrollToBottom();
     }
     return Scaffold(
@@ -114,7 +115,7 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
           controller: scrollController,
           itemCount: dataMessage.length,
           itemBuilder: (context, index) {
-            return dataMessage[index]['chat_id'] == widget.myselftID
+            return dataMessage[index]['sender_id'] == widget.myselftID
                 ? Align(
                     alignment: Alignment.centerRight,
                     child: Container(
@@ -201,8 +202,8 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
     ref.read(websocketStateNotifierProvider.notifier).sendMessage({
       'type': 'message',
       'id': widget.dataUserChat['_id'],
-      'chat_id': widget.myselftID,
-      'sender_id': widget.dataUserChat['partner']['id'],
+      'sender_id': widget.myselftID,
+      'receiver_id': widget.dataUserChat['partner']['id'],
       'content': content
     });
     textEditingController.clear();
