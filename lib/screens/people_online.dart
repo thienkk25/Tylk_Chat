@@ -1,17 +1,20 @@
 import 'dart:async';
 
 import 'package:app_chat/controllers/user_controller.dart';
+import 'package:app_chat/screens/notifications.dart';
+import 'package:app_chat/services/others_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class PeopleOnline extends StatefulWidget {
+class PeopleOnline extends ConsumerStatefulWidget {
   const PeopleOnline({super.key});
 
   @override
-  State<PeopleOnline> createState() => _PeopleOnlineState();
+  ConsumerState<PeopleOnline> createState() => _PeopleOnlineState();
 }
 
-class _PeopleOnlineState extends State<PeopleOnline> {
+class _PeopleOnlineState extends ConsumerState<PeopleOnline> {
   final userController = UserController();
 
   List dataFriends = [];
@@ -21,6 +24,7 @@ class _PeopleOnlineState extends State<PeopleOnline> {
   List dataSearch = [];
   List temporaryData = [];
   String? myselftEmail;
+  Map dataNotifications = {};
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -31,6 +35,7 @@ class _PeopleOnlineState extends State<PeopleOnline> {
 
   Future<void> load() async {
     dataFriends = await userController.getFriends();
+    dataNotifications = await userController.getNotifications(ref);
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       myselftEmail = prefs.getString("emailUser")!;
@@ -39,6 +44,9 @@ class _PeopleOnlineState extends State<PeopleOnline> {
 
   @override
   void dispose() {
+    whoSendController.dispose();
+    contentSendController.dispose();
+    timer?.cancel();
     super.dispose();
   }
 
@@ -50,8 +58,21 @@ class _PeopleOnlineState extends State<PeopleOnline> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const SizedBox(
-                width: 5,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => Notifications(
+                                dataNotifications: dataNotifications)));
+                  },
+                  child: Badge(
+                    label: Text(ref.watch(notificationState).toString()),
+                    child: const Icon(Icons.notifications),
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),

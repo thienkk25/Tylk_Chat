@@ -76,4 +76,34 @@ class UserService {
 
     return data;
   }
+
+  Future<Map> getNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    final uri = Uri.parse("http://localhost:3000/v1/api/user/notifications");
+    final response = await http.get(
+      uri,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer ${prefs.getString('token')!}"
+      },
+    );
+    final data = jsonDecode(response.body);
+
+    return data;
+  }
+
+  Future<Map> updateNotifications(String senderId, String status) async {
+    final prefs = await SharedPreferences.getInstance();
+    final uri = Uri.parse("http://localhost:3000/v1/api/user/notifications");
+    final response = await http.put(
+      uri,
+      body: jsonEncode({"sender_id": senderId, "status": status}),
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer ${prefs.getString('token')!}"
+      },
+    );
+    final data = jsonDecode(response.body);
+    return data;
+  }
 }

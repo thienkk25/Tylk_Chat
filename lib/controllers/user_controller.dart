@@ -1,4 +1,6 @@
+import 'package:app_chat/services/others_provider.dart';
 import 'package:app_chat/services/user_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class UserController {
   final userService = UserService();
@@ -23,5 +25,25 @@ class UserController {
   Future<List> getSearchClients(String searchQuery) async {
     final data = await userService.getSearchClients(searchQuery);
     return data['data'];
+  }
+
+  Future<Map> getNotifications(WidgetRef ref) async {
+    final data = await userService.getNotifications();
+    if (data['data'].isNotEmpty && data['data']['dataFriendRequests'] != null) {
+      int dataFriendRequests = data['data']['dataFriendRequests'].length;
+      ref.read(notificationState.notifier).state = dataFriendRequests;
+      return data['data'];
+    } else {
+      ref.read(notificationState.notifier).state = 0;
+      return {
+        "dataFriendRequests": [],
+        "dataNotifications": [],
+      };
+    }
+  }
+
+  Future<Map> updateNotifications(String senderId, String status) async {
+    final data = await userService.updateNotifications(senderId, status);
+    return data;
   }
 }

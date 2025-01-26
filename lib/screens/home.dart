@@ -210,6 +210,7 @@ class _HomeState extends ConsumerState<Home> {
                             child: TextField(
                               controller: contentSendController,
                               decoration: const InputDecoration(
+                                hintText: "Message...",
                                 border: InputBorder.none,
                               ),
                               maxLines: null,
