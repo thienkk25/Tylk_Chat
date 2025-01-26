@@ -176,6 +176,8 @@ class _LoginState extends State<Login> {
       prefs.setString('token', data['token']);
       prefs.setString('idUser', data['user']['id']);
       prefs.setString('emailUser', data['user']['email']);
+      prefs.setString('userName', data['user']['username']);
+      prefs.setString('profilePicture', data['user']['profile_picture']);
       if (!mounted) return;
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (_) => const Home()));

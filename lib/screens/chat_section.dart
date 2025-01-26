@@ -79,6 +79,7 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
     }
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.lightGreen,
         title: Row(
           children: [
             const CircleAvatar(
@@ -111,65 +112,74 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
           ),
         ],
       ),
-      body: ListView.builder(
-          controller: scrollController,
-          itemCount: dataMessage.length,
-          itemBuilder: (context, index) {
-            return dataMessage[index]['sender_id'] == widget.myselftID
-                ? Align(
-                    alignment: Alignment.centerRight,
-                    child: Container(
-                      margin: const EdgeInsets.all(10),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                              width: 1, color: Colors.lightBlueAccent),
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.blueAccent),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            dataMessage[index]['content'],
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            FormatTime().coverTimeFromIso(
-                                dataMessage[index]['timestamp']),
-                            style: TextStyle(
-                                fontSize: 10, color: Colors.grey[400]),
-                          ),
-                        ],
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [Color(0xffCCFFAA), Color(0xff1E5B53)],
+          ),
+        ),
+        child: ListView.builder(
+            controller: scrollController,
+            itemCount: dataMessage.length,
+            itemBuilder: (context, index) {
+              return dataMessage[index]['sender_id'] == widget.myselftID
+                  ? Align(
+                      alignment: Alignment.centerRight,
+                      child: Container(
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                width: 1, color: Colors.lightBlueAccent),
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.blueAccent),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              dataMessage[index]['content'],
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            Text(
+                              FormatTime().coverTimeFromIso(
+                                  dataMessage[index]['timestamp']),
+                              style: TextStyle(
+                                  fontSize: 10, color: Colors.grey[400]),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  )
-                : Align(
-                    alignment: Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.all(10),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          border: Border.all(width: 1, color: Colors.black),
-                          borderRadius: BorderRadius.circular(10),
-                          color: Colors.black),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            dataMessage[index]['content'],
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                          Text(
-                            FormatTime().coverTimeFromIso(
-                                dataMessage[index]['timestamp']),
-                            style: TextStyle(
-                                fontSize: 10, color: Colors.grey[400]),
-                          ),
-                        ],
+                    )
+                  : Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        margin: const EdgeInsets.all(10),
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                            border: Border.all(width: 1, color: Colors.black),
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.black),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              dataMessage[index]['content'],
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                            Text(
+                              FormatTime().coverTimeFromIso(
+                                  dataMessage[index]['timestamp']),
+                              style: TextStyle(
+                                  fontSize: 10, color: Colors.grey[400]),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-          }),
+                    );
+            }),
+      ),
       bottomNavigationBar: Row(
         children: [
           Expanded(

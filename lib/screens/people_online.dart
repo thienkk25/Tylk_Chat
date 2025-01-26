@@ -52,87 +52,101 @@ class _PeopleOnlineState extends ConsumerState<PeopleOnline> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => Notifications(
-                                dataNotifications: dataNotifications)));
-                  },
-                  child: Badge(
-                    label: Text(ref.watch(notificationState).toString()),
-                    child: const Icon(Icons.notifications),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Color(0xff18A5A7), Color(0xffBFFFC7)],
+        ),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => Notifications(
+                                  dataNotifications: dataNotifications)));
+                    },
+                    child: Badge(
+                      label: Text(ref.watch(notificationState).toString()),
+                      child: const Icon(Icons.notifications),
+                    ),
                   ),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextButton(
-                    onPressed: () {
-                      addFriendDialog(context);
-                    },
-                    child: const Text("Add Friend")),
-              )
-            ],
-          ),
-          RefreshIndicator(
-            onRefresh: () => load(),
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: dataFriends.length,
-              itemBuilder: (context, index) => Card(
-                margin: const EdgeInsets.all(10),
-                child: Padding(
+                Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Stack(
-                        children: [
-                          const CircleAvatar(
-                            radius: 40,
-                          ),
-                          Positioned(
-                            right: 0,
-                            bottom: 0,
-                            child: CircleAvatar(
-                              backgroundColor:
-                                  dataFriends[index]['status'] == 'online'
-                                      ? Colors.green
-                                      : Colors.grey,
-                              radius: 10,
+                  child: TextButton(
+                      onPressed: () {
+                        addFriendDialog(context);
+                      },
+                      child: const Text("Add Friend")),
+                )
+              ],
+            ),
+            RefreshIndicator(
+              onRefresh: () => load(),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: dataFriends.length,
+                itemBuilder: (context, index) => Container(
+                  decoration: const BoxDecoration(
+                    borderRadius:
+                        BorderRadiusDirectional.all(Radius.circular(10)),
+                    gradient: LinearGradient(
+                      colors: [Color(0xff353A5F), Color(0xff9EBAF3)],
+                    ),
+                  ),
+                  margin: const EdgeInsets.all(10),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Stack(
+                          children: [
+                            const CircleAvatar(
+                              radius: 40,
                             ),
-                          ),
-                        ],
-                      ),
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 10, right: 10),
-                          child: Text(
-                            dataFriends[index]['username'],
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontWeight: FontWeight.w600,
+                            Positioned(
+                              right: 0,
+                              bottom: 0,
+                              child: CircleAvatar(
+                                backgroundColor:
+                                    dataFriends[index]['status'] == 'online'
+                                        ? Colors.green
+                                        : Colors.grey,
+                                radius: 10,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10, right: 10),
+                            child: Text(
+                              dataFriends[index]['username'],
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -144,9 +158,10 @@ class _PeopleOnlineState extends ConsumerState<PeopleOnline> {
         return StatefulBuilder(
           builder: (context, StateSetter setDialogState) {
             return Dialog(
-              child: SizedBox(
+              child: Container(
                 height: double.infinity,
                 width: double.infinity,
+                decoration: const BoxDecoration(color: Colors.lightGreen),
                 child: Column(
                   children: [
                     ListTile(
