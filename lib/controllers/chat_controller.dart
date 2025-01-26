@@ -8,7 +8,7 @@ class ChatController {
     return data;
   }
 
-  Future<Map> chats(
+  Future<Map?> chats(
       List participants, String content, String receiverId) async {
     return await chatService.chats(participants, content, receiverId);
   }
@@ -19,7 +19,7 @@ class ChatController {
     return data;
   }
 
-  Future<Map> messages(String receiverId, String content, String messageType,
+  Future<Map?> messages(String receiverId, String content, String messageType,
       List attachments, String status) async {
     return await chatService.messages(
         receiverId, content, messageType, attachments, status);

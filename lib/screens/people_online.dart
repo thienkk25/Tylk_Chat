@@ -335,5 +335,12 @@ class _PeopleOnlineState extends ConsumerState<PeopleOnline> {
     );
   }
 
-  void addFriendsAll() {}
+  Future<void> addFriendsAll() async {
+    await userController.addFriends([...temporaryData.map((e) => e['_id'])]);
+    temporaryData = [];
+    if (!mounted) return;
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text("Success")));
+  }
 }

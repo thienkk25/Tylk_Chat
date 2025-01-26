@@ -193,11 +193,11 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
   }
 
   Future<void> sendMessage(String content) async {
-    final resultChat = await chatController.chats(
+    await chatController.chats(
         [widget.myselftID, widget.dataUserChat['partner']['id']],
         content,
         widget.dataUserChat['partner']['id']);
-    final resultMessage = await chatController.messages(
+    await chatController.messages(
         widget.dataUserChat['partner']['id'], content, "message", [], "");
     ref.read(websocketStateNotifierProvider.notifier).sendMessage({
       'type': 'message',
