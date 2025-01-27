@@ -110,7 +110,14 @@ class _PeopleOnlineState extends ConsumerState<PeopleOnline> {
                       children: [
                         Stack(
                           children: [
-                            const CircleAvatar(
+                            CircleAvatar(
+                              backgroundImage: dataFriends[index]
+                                          ['profile_picture'] !=
+                                      ""
+                                  ? NetworkImage(
+                                      dataFriends[index]['profile_picture'])
+                                  : const NetworkImage(
+                                      "https://res.cloudinary.com/dksr7si4o/image/upload/v1737961456/flutter/avatar/6_cnm2fb.jpg"),
                               radius: 40,
                             ),
                             Positioned(

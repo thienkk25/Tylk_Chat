@@ -30,139 +30,150 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: Stack(
         children: [
-          SizedBox(
-            height: MediaQuery.of(context).size.height / 4,
+          Image.asset(
+            "assets/background/ab.jpg",
+            height: double.infinity,
             width: double.infinity,
-            child: const Center(
-              child: Text(
-                "Login",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ),
+            fit: BoxFit.fill,
           ),
-          SizedBox(
-            width: MediaQuery.of(context).size.width / 1.5,
-            child: Form(
-                key: keyForm,
-                child: Column(
-                  children: [
-                    TextFormField(
-                      controller: email,
-                      validator: (value) {
-                        if (value == "" || value!.isEmpty) {
-                          return "Please enter email";
-                        } else if (!emailRegExp.hasMatch(value)) {
-                          return "Email is not in correct format";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.email),
-                          border: OutlineInputBorder(
-                            borderSide: const BorderSide(width: 1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          focusColor: Colors.black,
-                          labelText: "Email",
-                          labelStyle: const TextStyle(color: Colors.black),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(width: 1),
-                            borderRadius: BorderRadius.circular(20),
-                          )),
-                      cursorColor: Colors.black,
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    TextFormField(
-                      controller: password,
-                      validator: (value) {
-                        if (value == "" || value!.isEmpty) {
-                          return "Please enter pasword";
-                        }
-                        return null;
-                      },
-                      decoration: InputDecoration(
-                          prefixIcon: const Icon(Icons.lock),
-                          suffixIcon: const Icon(Icons.visibility),
-                          border: OutlineInputBorder(
-                            borderSide: const BorderSide(width: 1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          focusColor: Colors.black,
-                          labelText: "Password",
-                          labelStyle: const TextStyle(color: Colors.black),
-                          focusedBorder: OutlineInputBorder(
-                            borderSide: const BorderSide(width: 1),
-                            borderRadius: BorderRadius.circular(20),
-                          )),
-                      cursorColor: Colors.black,
-                    ),
-                    const SizedBox(
-                      height: 5,
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (_) => const Forgot()));
-                        },
-                        child: const Text(
-                          "Forgot",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    InkWell(
-                      onTap: () {
-                        if (keyForm.currentState!.validate()) {
-                          login(email.text, password.text);
-                        }
-                      },
-                      child: Container(
-                        height: 50,
-                        width: MediaQuery.of(context).size.width / 3,
-                        decoration: BoxDecoration(
-                            color: Colors.blue,
-                            borderRadius: BorderRadius.circular(20)),
-                        child: const Center(
-                            child: Text(
-                          "Login",
-                          style: TextStyle(fontSize: 16, color: Colors.white),
-                        )),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+          Column(
+            children: [
+              SizedBox(
+                height: MediaQuery.of(context).size.height / 4,
+                width: double.infinity,
+                child: const Center(
+                  child: Text(
+                    "Login",
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width / 1.5,
+                child: Form(
+                    key: keyForm,
+                    child: Column(
                       children: [
-                        const Text("You don't have account?"),
+                        TextFormField(
+                          controller: email,
+                          validator: (value) {
+                            if (value == "" || value!.isEmpty) {
+                              return "Please enter email";
+                            } else if (!emailRegExp.hasMatch(value)) {
+                              return "Email is not in correct format";
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.email),
+                              border: OutlineInputBorder(
+                                borderSide: const BorderSide(width: 1),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              focusColor: Colors.black,
+                              labelText: "Email",
+                              labelStyle: const TextStyle(color: Colors.black),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(width: 1),
+                                borderRadius: BorderRadius.circular(20),
+                              )),
+                          cursorColor: Colors.black,
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          controller: password,
+                          validator: (value) {
+                            if (value == "" || value!.isEmpty) {
+                              return "Please enter pasword";
+                            }
+                            return null;
+                          },
+                          decoration: InputDecoration(
+                              prefixIcon: const Icon(Icons.lock),
+                              suffixIcon: const Icon(Icons.visibility),
+                              border: OutlineInputBorder(
+                                borderSide: const BorderSide(width: 1),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              focusColor: Colors.black,
+                              labelText: "Password",
+                              labelStyle: const TextStyle(color: Colors.black),
+                              focusedBorder: OutlineInputBorder(
+                                borderSide: const BorderSide(width: 1),
+                                borderRadius: BorderRadius.circular(20),
+                              )),
+                          cursorColor: Colors.black,
+                        ),
+                        const SizedBox(
+                          height: 5,
+                        ),
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (_) => const Forgot()));
+                            },
+                            child: const Text(
+                              "Forgot",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
                         InkWell(
                           onTap: () {
-                            Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (_) => const Register()));
+                            if (keyForm.currentState!.validate()) {
+                              login(email.text, password.text);
+                            }
                           },
-                          child: const Text(
-                            "Register",
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          child: Container(
+                            height: 50,
+                            width: MediaQuery.of(context).size.width / 3,
+                            decoration: BoxDecoration(
+                                color: Colors.blue,
+                                borderRadius: BorderRadius.circular(20)),
+                            child: const Center(
+                                child: Text(
+                              "Login",
+                              style:
+                                  TextStyle(fontSize: 16, color: Colors.white),
+                            )),
                           ),
                         ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text("You don't have account?"),
+                            InkWell(
+                              onTap: () {
+                                Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) => const Register()));
+                              },
+                              child: const Text(
+                                "Register",
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          ],
+                        )
                       ],
-                    )
-                  ],
-                )),
+                    )),
+              ),
+            ],
           ),
         ],
       ),

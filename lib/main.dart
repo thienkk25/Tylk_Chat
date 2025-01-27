@@ -39,7 +39,6 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: token != null ? const Home() : const Welcome(),
-      // home: Home(),
     );
   }
 }

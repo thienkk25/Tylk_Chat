@@ -82,7 +82,14 @@ class _ChatSectionState extends ConsumerState<ChatSection> {
         backgroundColor: Colors.lightGreen,
         title: Row(
           children: [
-            const CircleAvatar(
+            CircleAvatar(
+              backgroundImage: widget.dataUserChat['partner']
+                          ['profile_picture'] !=
+                      ""
+                  ? NetworkImage(
+                      widget.dataUserChat['partner']['profile_picture'])
+                  : const NetworkImage(
+                      "https://res.cloudinary.com/dksr7si4o/image/upload/v1737961456/flutter/avatar/6_cnm2fb.jpg"),
               radius: 20,
             ),
             Expanded(
