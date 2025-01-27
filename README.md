@@ -39,6 +39,7 @@ Tylk_Chat is a modern messaging app designed to help you connect with friends, f
   - **Websocket**
   - **JWT**
   - **MongoDB**
+- [Tylk_Chat_Backend](https://github.com/thienkk25/Tylk_Chat_Backend.git)
 
 ### 3. **API Integration**  
 - **RESTful API**: Connect with external services or custom backend features.  
