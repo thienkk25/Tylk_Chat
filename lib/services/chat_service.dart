@@ -50,7 +50,7 @@ class ChatService {
     };
 
     final uri = Uri.parse(
-        "http://localhost:3000/v1/api/chat/messages?render_id=$receiverId&limit=$limit&page=$page");
+        "http://localhost:3000/v1/api/chat/messages?receiver_id=$receiverId&limit=$limit&page=$page");
     final response = await http.get(
       uri,
       headers: headers,
