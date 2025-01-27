@@ -61,4 +61,4 @@ Tylk_Chat is a modern messaging app designed to help you connect with friends, f
 ## Project results
 
 # Image:
-<img src="assets/result/welcome.png" width="300"> <img src="assets/result/login.png" width="300"> <img src="assets/result/register.png" width="300"> <img src="assets/result/home.png" width="300"> <img src="assets/result/drawer.png" width="300"> <img src="assets/result/myprofile.png" width="300"> <img src="assets/resultScreen/cart_screen.jpg" width="300"> <img src="assets/result/people.png" width="300"> <img src="assets/result/section.png"> <img src="assets/result/addfirend.png" width="300">
+<img src="assets/result/welcome.png" width="300"> <img src="assets/result/login.png" width="300"> <img src="assets/result/register.png" width="300"> <img src="assets/result/home.png" width="300"> <img src="assets/result/drawer.png" width="300"> <img src="assets/result/myprofile.png" width="300"> <img src="assets/result/people.png" width="300"> <img src="assets/result/section.png"> <img src="assets/result/addfirend.png" width="300">
