@@ -48,16 +48,6 @@ Tylk_Chat is a modern messaging app designed to help you connect with friends, f
 ### 4. **State Management**  
 - **Riverpod**: Efficiently manage application state.
 
-## Installation and Deployment  
-1. Clone the repository:  
-   ```bash  
-   git clone https://github.com/thienkk25/Tylk_Chat.git  
-   ```
-2. Install dependencies:
-    After cloning the repository, open the project folder in Visual Studio Code or IDE and run the following command to install the dependencies:
-    ```bash  
-   flutter pub get
-   ```
 ## Project results
 
 # Image:
